@@ -20,7 +20,7 @@
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <div class="form-container">
-        <form method="POST" action="/process">
+        <form method="POST" action="/process" id="form">
             <div class="input-wrapper">
                 <textarea name="url" id="url" value="" placeholder="Enter URL here" class="url-input"
                     readonly></textarea>
@@ -36,9 +36,9 @@
         </form>
     </div>
     <div class="text-container">
-        <i class="unicode">&#8592</i>
+        <i class="unicode">&times</i>
         <div class="content">
-            <div class="title">
+            <!-- <div class="title">
                 <input type="text" name="product-title" value="تیشرت سفید">
             </div>
             <div class="brand">
@@ -68,12 +68,13 @@
                         </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 
     <!-- Scripts -->
     <script src="assets/app.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" type="text/javascript"></script>
 </body>
 
 </html>
