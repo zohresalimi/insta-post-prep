@@ -15,14 +15,34 @@ async function processProduct(url) {
 	var productImages = getProductImages()
 	var productTitle = getProductTitle()
 	var productPrice = getProductPrice()
+	var shortenerUrl = await getShortenerUrl(url, productTitle, brandName)
 
 	console.log("URL parse complete...", brandName)
 	return {
 		brand: brandName,
 		productImages: productImages,
 		productTitle: productTitle,
-		productPrice: productPrice
+		productPrice: productPrice,
+		shortenerUrl: shortenerUrl
 	}
+}
+
+async function getShortenerUrl(url, title, brand) {
+	const uri = "https://cutt.ly/api/api.php"
+	const nameRegex = (title + brand).match(/[a-zA-Z]+/g)
+	let name = nameRegex.join("") + Math.round(Math.random() * 1000)
+	console.log("Shortening...... : ", nameRegex)
+	var options = {
+		uri,
+		qs: {
+			key: "483d90b0ec16528f8f4964080ab532253e213",
+			short: url,
+			name
+		}
+	}
+
+	const shortenedUrl = await rp(options)
+	return JSON.parse(shortenedUrl)
 }
 
 function getProductBrand() {
@@ -73,7 +93,9 @@ function getProductPrices(prices) {
 				.text()
 				.includes("%")
 		) {
-			priceList.push(parseInt($(element).text()))
+			let priceText = $(element).text()
+			priceText = priceText.replace(/\s/g, "")
+			priceList.push(parseInt(priceText))
 		}
 	}
 	return priceList

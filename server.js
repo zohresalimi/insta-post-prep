@@ -21,8 +21,6 @@ app.post("/process", async (req, res) => {
 		responseJson.data = error
 	})
 
-	console.log(productDetail)
-
 	if (!productDetail) {
 		responseJson.status = false
 		responseJson.data = "Could not find product"
