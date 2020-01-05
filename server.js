@@ -1,8 +1,9 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 const app = express()
-const port = 3000
 const path = require("path")
+const isProduction = process.NODE_END === "production"
+const port = isProduction ? 8080 : 3000
 
 const { processProduct } = require("./main")
 
@@ -32,4 +33,4 @@ app.post("/process", async (req, res) => {
 	res.json(responseJson)
 })
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`App listening on port ${port}!`))
