@@ -3,7 +3,7 @@ const bodyParser = require("body-parser")
 const app = express()
 const path = require("path")
 const isProduction = process.env.NODE_ENV === "production"
-const port = isProduction ? 8080 : 3000
+const port = isProduction ? 80 : 3000
 
 const { processProduct } = require("./main")
 
