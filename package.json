@@ -4,8 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"start": "nodemon main.js",
-		"start:heroku": "node main.js",
+		"start": "nodemon server.js",
+		"start:heroku": "node server.js",
 		"test": "mocha"
 	},
 	"author": "",
