@@ -4,39 +4,43 @@ var $
 
 async function processProduct(url) {
 	console.log("Started parsing url: ", url)
-	const html = await rp(url).catch(function(err) {
+	const html = await rp(url).catch(err => {
 		console.log(err)
 		return "error"
 	})
 
 	$ = cheerio.load(html)
 
-	var brandName = getProductBrand()
-	var productImages = getProductImages()
-	var productTitle = getProductTitle()
-	var productPrice = getProductPrice()
-	var shortenerUrl = await getShortenerUrl(url, productTitle, brandName)
+	const brand = getProductBrand()
+	const productImages = getProductImages()
+	const productTitle = getProductTitle()
+	const productPrice = getProductPrice()
+	const shortenerUrl = await getShortenerUrl(url, productTitle, brand)
 
-	console.log("URL parse complete...", brandName)
+	console.log("URL parse complete...", brand)
 	return {
-		brand: brandName,
-		productImages: productImages,
-		productTitle: productTitle,
-		productPrice: productPrice,
-		shortenerUrl: shortenerUrl
+		brand,
+		productImages,
+		productTitle,
+		productPrice,
+		shortenerUrl
 	}
 }
 
-async function getShortenerUrl(url, title, brand) {
+function getRandomName(name) {
+	return name.join("") + Math.round(Math.random() * 1000)
+}
+
+async function getShortenerUrl(short, title, brand) {
 	const uri = "https://cutt.ly/api/api.php"
 	const nameRegex = (title + brand).match(/[a-zA-Z]+/g)
-	let name = nameRegex.join("") + Math.round(Math.random() * 1000)
+	let name = getRandomName(nameRegex)
 	console.log("Shortening...... : ", nameRegex)
 	var options = {
 		uri,
 		qs: {
 			key: "483d90b0ec16528f8f4964080ab532253e213",
-			short: url,
+			short,
 			name
 		}
 	}
@@ -51,6 +55,7 @@ function getProductBrand() {
 
 function getProductImages() {
 	let images = $("img")
+
 	var srcList = []
 	for (var i = 0; i < images.length; i++) {
 		let { src } = images[i].attribs
@@ -79,7 +84,9 @@ function getProductPrice() {
 		productPrice.oldPrice = Math.max(...prices)
 		productPrice.newPrice = Math.min(...prices)
 	} else {
-		productPrice.amount = parseInt($(productPrices).text())
+		let priceText = $(productPrices).text()
+		priceText = priceText.replace(/\s/g, "")
+		productPrice.amount = parseInt(priceText)
 	}
 	return productPrice
 }

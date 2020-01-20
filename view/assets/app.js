@@ -1,19 +1,30 @@
 const processBtn = document.querySelector(".button-wrapper button")
 const form = document.getElementById("form")
 const textContainerElement = document.querySelector(".text-container")
+const urlInput = document.querySelector(".url-input")
+const pasteBtn = document.querySelector("#paste-btn")
 
-async function paste(e) {
+// const eurRate = async () => {
+// 	const result = await getEurRate()
+// 	return result
+// }
+
+const eurRate = getEurRate()
+
+urlInput.addEventListener("change", function (e) {
+	if (e.target.textContent) {
+		e.target.disabled = false
+	}
+})
+
+async function pasteFromClipboard(e) {
 	e.preventDefault()
-	var pasteText = document.querySelector(".url-input")
 	const text = await navigator.clipboard.readText()
-	pasteText.textContent = text
-	if (pasteText.textContent) {
+	urlInput.textContent = text
+	if (urlInput.textContent) {
 		processBtn.disabled = false
 	}
-
-	console.log(text)
 }
-const pasteBtn = document.querySelector("#paste-btn")
 
 async function readFromClipboard() {
 	const clipboardText = await navigator.clipboard.readText().catch(err => {
@@ -28,38 +39,39 @@ async function readFromClipboard() {
 }
 
 setInterval(readFromClipboard, 1000)
-pasteBtn.addEventListener("click", paste)
+pasteBtn.addEventListener("click", pasteFromClipboard)
 var productDetail = {}
 
-function formSubmit(e) {
+async function formSubmit(e) {
 	e.preventDefault()
-	const url = e.target.action
-	const method = e.target.method
-	const inputUrl = document.getElementById("url").value
+	const { action: url, method } = e.target
+	const inputUrl = urlInput.value
 	const data = {
 		url: inputUrl
 	}
-	axios({ method, url, data }).then(function(res) {
-		console.log(res)
-		if (res.status) {
-			productDetail = res.data.data
-			renderTemplate()
-			textContainerElement.style.display = "block"
-		}
-	})
+
+	const resalt = await axios({ method, url, data })
+	if (resalt.status) {
+		productDetail = resalt.data.data
+		renderTemplate()
+		textContainerElement.style.display = "block"
+	}
 }
 
-async function toEuro(sekPrice) {
+async function getEurRate() {
 	const url = "https://api.exchangeratesapi.io/latest?symbols=SEK"
 	const method = "get"
 	const headers = {
 		"Access-Control-Allow-Origin": "*"
 	}
 
-	const rateResponse = await axios({ method, url }, headers)
-	const euroPrice = (sekPrice / rateResponse.data.rates.SEK).toFixed(0)
+	return await axios({ method, url }, headers)
+}
 
-	return euroPrice
+async function toEuro(sekPrice) {
+	// const result = await getEurRate()
+	let rate = await eurRate
+	return (sekPrice / rate.data.rates.SEK).toFixed(0)
 }
 
 async function getPriceLabel(productPrice) {
@@ -110,7 +122,7 @@ async function renderTemplate() {
 	const titleInput = document.createElement("input")
 	titleInput.value = productTitle
 	titleInput.name = "input-title"
-	titleInput.addEventListener("keyup", function(e) {
+	titleInput.addEventListener("keyup", function (e) {
 		// apply input values on final text
 		applyTitleAndSize(e)
 	})
@@ -142,7 +154,7 @@ async function setParametersToInnerText(elem, values) {
 			? `
     ${values.size}`
 			: ""
-	}
+		}
     ---------------
     خرید و ارسال از اروپا
     ${await getPriceLabel(values.productPrice)}
@@ -157,25 +169,14 @@ async function setParametersToInnerText(elem, values) {
 `
 }
 
-form.addEventListener("submit", formSubmit)
-
 function showImages(productImages) {
 	const imageWrapper = document.getElementById("images-wrapper")
 	imageWrapper.innerHTML = ""
 	for (let i = 0; i < productImages.length; i++) {
 		const elementSrc = productImages[i].src
-		console.log(elementSrc)
 		const img = document.createElement("img")
 		img.src = elementSrc
 		imageWrapper.appendChild(img)
-		img.addEventListener("click", function() {
-			var link = document.createElement("a")
-			link.href = elementSrc
-			link.download = `_insta_${i}.jpg`
-			document.body.appendChild(link)
-			link.click()
-			document.body.removeChild(link)
-		})
 	}
 }
 
@@ -189,20 +190,21 @@ function applyTitleAndSize(e) {
 	const { brand, productPrice, shortenerUrl } = productDetail
 	// get input values
 	const inputElements = document.querySelectorAll("input[name^='input-']")
-	const titleValue = inputElements[0].value
-	const sizeValue = inputElements[1].value
+	const title = inputElements[0].value
+	const size = inputElements[1].value
 	// get final text from page
 	const finalTextDiv = document.getElementById("final-text")
-	const finalTextContent = finalTextDiv.innerText
 
 	// apply input values to template string
 	setParametersToInnerText(finalTextDiv, {
 		brand,
 		productPrice,
 		shortenerUrl,
-		title: titleValue,
-		size: sizeValue
+		title,
+		size
 	})
 
 	// set changed text to page
 }
+
+form.addEventListener("submit", formSubmit)
