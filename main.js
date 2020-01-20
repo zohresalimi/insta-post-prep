@@ -78,6 +78,7 @@ function getProductTitle() {
 function getProductPrice() {
 	var productPrice = {}
 	productPrices = $(".h-product-price > *")
+
 	if (productPrices.length > 1) {
 		productPrice.discount = getProductDiscount(productPrices)
 		let prices = getProductPrices(productPrices)
@@ -85,8 +86,11 @@ function getProductPrice() {
 		productPrice.newPrice = Math.min(...prices)
 	} else {
 		let priceText = $(productPrices).text()
-		priceText = priceText.replace(/\s/g, "")
+		priceText = priceText.match(/\d+/g).map(Number).join("");
+		// priceText = priceText.replace(/\s/g, "")
+		console.log("PriceText >>>>>>>>>>>>>>", priceText)
 		productPrice.amount = parseInt(priceText)
+		console.log(productPrice)
 	}
 	return productPrice
 }
