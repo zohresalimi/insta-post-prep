@@ -84,9 +84,9 @@ function getProductPrice() {
 		productPrice.oldPrice = Math.max(...prices)
 		productPrice.newPrice = Math.min(...prices)
 	} else {
-		let priceTextF = $(productPrices).text()
-		priceTextF = priceText.replace(/\s/g, "")
-		productPrice.amount = parseInt(priceTextF)
+		let priceText = $(productPrices).text()
+		priceText = priceText.replace(/\s/g, "")
+		productPrice.amount = parseInt(priceText)
 	}
 	return productPrice
 }
